@@ -3,7 +3,7 @@ name: Generate RSS Daily
 on:
   schedule:
     - cron: '0 6 * * *'  # Tous les jours à 6h du matin UTC
-  workflow_dispatch:      # Pour pouvoir aussi le lancer manuellement
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Cloner le dépôt
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Installer Python
       uses: actions/setup-python@v4
@@ -22,14 +24,16 @@ jobs:
       run: |
         pip install requests beautifulsoup4 feedgen
 
-    - name: Générer le fichier RSS
+    - name: Générer le flux RSS
       run: |
         python nicotinepolicy_rss.py
 
-    - name: Commit et push du RSS
+    - name: Commit et push
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add nicotinepolicy.xml
-        git commit -m "🔄 Mise à jour auto du flux RSS"
+        git add nicotinepolicy.xml || echo "Pas de changement"
+        git commit -m "🔄 MAJ auto du flux RSS" || echo "Pas de commit"
         git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
