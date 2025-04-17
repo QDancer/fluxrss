@@ -2,7 +2,7 @@ name: Generate RSS Daily
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Tous les jours à 6h du matin UTC
+        - cron: '0 * * * *'  # Toutes les heures, à 00 min
   workflow_dispatch:
 
 jobs:
