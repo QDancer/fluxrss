@@ -25,14 +25,14 @@ jobs:
         pip install requests beautifulsoup4 feedgen
 
     - name: Générer le flux RSS
-      run: |
-        python nicotinepolicy_rss.py
+  run: |
+    python nicotinepolicy_rss.py --output docs/nicotinepolicy.xml
 
     - name: Commit et push
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add nicotinepolicy.xml || echo "Pas de changement"
+        git add docs/nicotinepolicy.xml || echo "Pas de changement"
         git commit -m "🔄 MAJ auto du flux RSS" || echo "Pas de commit"
         git push
       env:
