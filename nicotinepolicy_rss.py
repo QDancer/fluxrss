@@ -38,5 +38,5 @@ for section in articles:
     entry.description(f"{summary} (Published on {date_text})")
 
 # Enregistre le fichier RSS
-fg.rss_file("nicotinepolicy.xml")
+fg.rss_file("docs/nicotinepolicy.xml")
 print("✅ Flux RSS généré : nicotinepolicy.xml")
