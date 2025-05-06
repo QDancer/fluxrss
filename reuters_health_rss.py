@@ -4,7 +4,25 @@ from feedgen.feed import FeedGenerator
 from datetime import datetime, timezone
 
 URL = "https://www.reuters.com/business/healthcare-pharmaceuticals/"
-resp = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"})
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/90.0.4430.93 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.reuters.com/",
+}
+
+try:
+    resp = requests.get(URL, headers=headers, timeout=15)
+    resp.raise_for_status()
+except requests.exceptions.RequestException as e:
+    print(f"⚠️ Impossible de récupérer la page Reuters: {e}")
+    # On sort sans planter le workflow
+    exit(0)
+
+soup = BeautifulSoup(resp.content, "html.parser")
+
 resp.raise_for_status()
 soup = BeautifulSoup(resp.content, "html.parser")
 
