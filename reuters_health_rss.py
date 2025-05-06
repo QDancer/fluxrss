@@ -13,46 +13,53 @@ headers = {
     "Referer": "https://www.reuters.com/",
 }
 
+# 1) Récupération de la page avec gestion d'erreur
 try:
     resp = requests.get(URL, headers=headers, timeout=15)
     resp.raise_for_status()
+    html = resp.content
 except requests.exceptions.RequestException as e:
     print(f"⚠️ Impossible de récupérer la page Reuters: {e}")
-    # On sort sans planter le workflow
-    exit(0)
+    html = ""  # on force un parsing vide
 
-soup = BeautifulSoup(resp.content, "html.parser")
+# 2) Parsing
+soup = BeautifulSoup(html, "html.parser")
 
-resp.raise_for_status()
-soup = BeautifulSoup(resp.content, "html.parser")
-
+# 3) Initialisation du flux
 fg = FeedGenerator()
 fg.title("Reuters – Healthcare & Pharmaceuticals")
 fg.link(href=URL, rel="alternate")
 fg.description("Breaking news on healthcare & pharma from Reuters")
 
+# 4) Extraction des cartes d'articles
 cards = soup.select("ul.static-media-maximizer__cards__1Z1KE li")
 for li in cards:
     a = li.select_one("a[data-testid='Title']")
     if not a:
         continue
+
+    # Titre et URL
     href = a["href"]
     if href.startswith("/"):
         href = "https://www.reuters.com" + href
     title = a.get_text(strip=True)
 
+    # Date
     time_tag = li.select_one("time[datetime]")
     pub_date = None
     if time_tag and time_tag.has_attr("datetime"):
         dt = time_tag["datetime"]
         pub_date = datetime.fromisoformat(dt.replace("Z", "+00:00"))
 
+    # Ajout de l'entrée RSS
     entry = fg.add_entry()
     entry.title(title)
     entry.link(href=href)
-    entry.description("")      # pas de résumé disponible ici
+    entry.description("")  # pas de résumé disponible
     if pub_date:
         entry.pubDate(pub_date)
 
-fg.rss_file("docs/reuters_healthcare_pharma.xml")
-print("✅ Flux généré : docs/reuters_healthcare_pharma.xml")
+# 5) Écriture à chaque fois, même si la liste est vide
+output = "docs/reuters_healthcare_pharma.xml"
+fg.rss_file(output)
+print(f"✅ Flux généré : {output}")
