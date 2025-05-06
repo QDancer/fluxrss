@@ -2,7 +2,7 @@ name: Generate RSS Daily
 
 on:
   schedule:
-        - cron: '0 * * * *'  # Toutes les heures, à 00 min
+    - cron: '0 * * * *'  # Toutes les heures, à 00 min
   workflow_dispatch:
 
 jobs:
@@ -10,30 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Cloner le dépôt
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cloner le dépôt
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Installer Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Installer les dépendances
-      run: |
-        pip install requests beautifulsoup4 feedgen
+      - name: Installer les dépendances
+        run: |
+          pip install requests beautifulsoup4 feedgen
 
-    - name: Générer le flux RSS
-  run: |
-    python nicotinepolicy_rss.py --output docs/nicotinepolicy.xml
+      - name: Générer le flux RSS
+        run: |
+          python nicotinepolicy_rss.py --output docs/nicotinepolicy.xml
 
-    - name: Commit et push
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git add docs/nicotinepolicy.xml || echo "Pas de changement"
-        git commit -m "🔄 MAJ auto du flux RSS" || echo "Pas de commit"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit et push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/nicotinepolicy.xml || echo "Pas de changement"
+          git commit -m "🔄 MAJ auto du flux RSS" || echo "Pas de commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
