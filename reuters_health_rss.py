@@ -9,12 +9,23 @@ API = (
 )
 
 # 2) Récupère le JSON
-resp = requests.get(API, headers={
-    "User-Agent": "Mozilla/5.0",
-    "Accept": "application/json",
-})
-resp.raise_for_status()
-data = resp.json()
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/90.0.4430.93 Safari/537.36",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.reuters.com/business/healthcare-pharmaceuticals/"
+}
+
+try:
+    resp = requests.get(API, headers=headers, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+except requests.exceptions.RequestException as e:
+    print(f"⚠️ Impossible d’appeler l’API Reuters: {e}")
+    data = {"result": []}
+
 
 # 3) Prépare le flux
 fg = FeedGenerator()
